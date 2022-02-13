@@ -1,0 +1,30 @@
+resolver = "2"
+
+[package]
+name = "godot_bevy_test"
+version = "0.1.0"
+authors = ["Jakyle <jjackson360@gmail.com>"]
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "staticlib"]
+
+
+
+dev = [
+    "bevy/dynamic",
+]
+
+[dependencies]
+gdnative = "0.9.3"
+bevy = { version = "0.6.0", default-features = false }
+lazy_static = "1.4.0"
+rand = "0.8.4"
+# gdnative = { path = "../../godot-rust/gdnative" }
+
+
+[target.'cfg(target_os = "linux")'.dependencies]
+winit = { version = "0.25", features=["x11"]}
+
+[build-dependencies]
+embed-resource = "1.4"
