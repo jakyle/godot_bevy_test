@@ -1,11 +1,14 @@
 use bevy::prelude::*;
 use gdnative::prelude::*;
 
-use crate::ecs::godot_bevy_sync::{
-    components::GodotRef, events::UserInput, resources::PhysicsDelta, stages::SyncStages,
-};
-
 use rand::prelude::*;
+
+use super::godot_bevy_sync::{
+    components::GodotObjRef,
+    events::{EndGame, UserInput},
+    resources::PhysicsDelta,
+    stages::SyncStages,
+};
 
 pub struct MovementPlugin;
 impl Plugin for MovementPlugin {
@@ -46,7 +49,7 @@ fn spawn_movement_player(
     for SpawnMovementPlayer((kb2, speed)) in on_spawn_movement_player.iter() {
         commands
             .spawn()
-            .insert(GodotRef(kb2.clone()))
+            .insert(GodotObjRef(kb2.clone()))
             .insert(Player)
             .insert(Speed(*speed))
             .insert(Velocity(Vector2::new(0.0, 0.0)));
@@ -60,15 +63,13 @@ fn spawn_movement_crab(
     for SpawnMovementCrab((kb2, speed)) in on_spawn_movement_player.iter() {
         let mut rng = rand::thread_rng();
 
-        let x: f32 = rng.gen_range(-0.01..0.01);
-        let y: f32 = rng.gen_range(-0.01..0.01);
+        let (x, y) = (rng.gen_range(-0.01..0.01), rng.gen_range(-0.01..0.01));
 
         let velocity = normalized(Vector2::new(x, y)) * *speed;
-        godot_print!("velocity: {:?}", velocity);
 
         commands
             .spawn()
-            .insert(GodotRef(kb2.clone()))
+            .insert(GodotObjRef(kb2.clone()))
             .insert(Crab)
             .insert(Velocity(velocity));
     }
@@ -83,14 +84,14 @@ fn on_movement_input(
 ) {
     for UserInput(action) in on_movement_input.iter() {
         match *action {
-            crate::ecs::godot_bevy_sync::events::Action::Pressed(msg) => match msg {
+            crate::ecs::plugins::godot_bevy_sync::events::Action::Pressed(msg) => match msg {
                 "ui_left" => input_vector.0 += Vector2::new(-1.0, 0.0),
                 "ui_right" => input_vector.0 += Vector2::new(1.0, 0.0),
                 "ui_down" => input_vector.0 += Vector2::new(0.0, 1.0),
                 "ui_up" => input_vector.0 += Vector2::new(0.0, -1.0),
                 _ => (),
             },
-            crate::ecs::godot_bevy_sync::events::Action::Released(msg) => match msg {
+            crate::ecs::plugins::godot_bevy_sync::events::Action::Released(msg) => match msg {
                 "ui_left" => input_vector.0 -= Vector2::new(-1.0, 0.0),
                 "ui_right" => input_vector.0 -= Vector2::new(1.0, 0.0),
                 "ui_down" => input_vector.0 -= Vector2::new(0.0, 1.0),
@@ -104,7 +105,7 @@ fn on_movement_input(
 fn move_player(
     delta: Res<PhysicsDelta>,
     input_vector: Res<InputVector>,
-    mut query: Query<(&mut Velocity, &Speed), (With<Player>, With<GodotRef<KinematicBody2D>>)>,
+    mut query: Query<(&mut Velocity, &Speed), (With<Player>, With<GodotObjRef<KinematicBody2D>>)>,
 ) {
     for (mut velocity, speed) in query.iter_mut() {
         velocity.0 = velocity.0.move_towards(
@@ -123,24 +124,44 @@ pub fn normalized(vector_to_normalize: Vector2) -> Vector2 {
     }
 }
 
-fn move_crab_sync(mut query: Query<(&GodotRef<KinematicBody2D>, &mut Velocity), With<Crab>>) {
-    for (kb2, mut velocity) in query.iter_mut() {
+fn move_crab_sync(
+    mut send_end_game: EventWriter<EndGame>,
+    mut crabs: Query<(&GodotObjRef<KinematicBody2D>, &mut Velocity), With<Crab>>,
+) {
+    for (kb2, mut velocity) in crabs.iter_mut() {
         unsafe {
             if let Some(tref_kb2d) = kb2.0.assume_safe_if_sane() {
                 let collider = tref_kb2d.move_and_collide(velocity.0, true, true, false);
 
                 if let Some(collider) = collider {
-                    let collider = collider.assume_safe();
+                    let collision = collider.assume_safe();
 
-                    velocity.0 = velocity.0.reflect(collider.normal());
+                    let is_player = collision
+                        .collider()
+                        .unwrap()
+                        .assume_safe()
+                        .cast::<Node2D>()
+                        .unwrap()
+                        .name()
+                        .to_string()
+                        .contains("Player");
+
+                    if is_player {
+                        send_end_game.send(EndGame);
+                    }
+
+                    velocity.0 = velocity.0.reflect(collision.normal());
                 }
             }
         }
     }
 }
 
-fn move_player_sync(mut commands: Commands, mut query: Query<(Entity, &GodotRef<KinematicBody2D>, &Velocity), With<Player>>) {
-    for (entity, kb2, velocity) in query.iter_mut() {
+fn move_player_sync(
+    mut send_end_game: EventWriter<EndGame>,
+    mut query: Query<(&GodotObjRef<KinematicBody2D>, &Velocity), With<Player>>,
+) {
+    for (kb2, velocity) in query.iter_mut() {
         unsafe {
             if let Some(tref_kb2d) = kb2.0.assume_safe_if_sane() {
                 for i in 0..tref_kb2d.get_slide_count() {
@@ -158,8 +179,7 @@ fn move_player_sync(mut commands: Commands, mut query: Query<(Entity, &GodotRef<
                         .contains("rab");
 
                     if is_crab {
-                        tref_kb2d.queue_free();
-                        commands.entity(entity).despawn();
+                        send_end_game.send(EndGame);
                     }
                 }
 

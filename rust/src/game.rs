@@ -4,6 +4,7 @@ use gdnative::prelude::*;
 #[derive(NativeClass)]
 #[inherit(Node)]
 #[register_with(Self::register_builder)]
+// #[user_data(gdnative::nativescript::user_data::RwLockData<Game>)]
 pub struct Game {
     name: String,
 }
@@ -22,8 +23,9 @@ impl Game {
     }
 
     #[export]
-    unsafe fn _ready(&mut self, _owner: &Node) {
-        self.name = "Game".to_string();
-        godot_print!("{} is ready!", self.name);
+    fn _ready(&mut self, owner: TRef<Node>) {
+        let ecs = owner.get_node("/root/ECSController").unwrap();
+        let ecs = unsafe { ecs.assume_safe() };
+        unsafe { ecs.call("add_game_to_ecs", &[Variant::from_object(owner)]) };
     }
 }

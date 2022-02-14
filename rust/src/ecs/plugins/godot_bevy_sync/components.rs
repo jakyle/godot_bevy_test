@@ -3,7 +3,13 @@ use gdnative::api::*;
 use gdnative::prelude::*;
 
 #[derive(Component)]
-pub struct GodotRef<T: GodotObject>(pub Ref<T>);
+pub struct GodotObjRef<T: GodotObject>(pub Ref<T>);
+
+#[derive(Component)]
+pub struct GodotSceneTree(pub Ref<SceneTree>);
+
+#[derive(Component)]
+pub struct GameNode;
 
 pub fn insert_godot_ref<'a, T: 'static + SubClass<Node>>(
     node: TRef<'a, Node>,
@@ -13,6 +19,6 @@ pub fn insert_godot_ref<'a, T: 'static + SubClass<Node>>(
         "Expected node to be castable into {}",
         node.get_class().to_string()
     ));
-    entity_mut.insert(GodotRef(node.claim()));
+    entity_mut.insert(GodotObjRef(node.claim()));
     node
 }

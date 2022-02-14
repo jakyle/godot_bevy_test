@@ -3,8 +3,11 @@ use gdnative::prelude::*;
 
 use crate::ecs::{
     app::get_ecs,
-    godot_bevy_sync::{
-        events::*,
+    plugins::godot_bevy_sync::{
+        events::{
+            spawn_game, spawn_movement_crab, spawn_movement_player, update_delta_resource,
+            user_input,
+        },
         resources::{IdleDelta, PhysicsDelta},
     },
 };
@@ -24,6 +27,7 @@ impl ECSController {
     fn register_builder(_builder: &ClassBuilder<Self>) {}
 
     fn new(_owner: &Node) -> Self {
+        godot_print!("ECSController is created!");
         let App {
             world, schedule, ..
         } = get_ecs();
@@ -35,7 +39,7 @@ impl ECSController {
     }
 
     #[export]
-    fn _ready(&mut self, owner: &Node) {
+    fn _ready(&mut self, _owner: &Node) {
         self.name = "ECSController".to_string();
     }
 
@@ -64,6 +68,11 @@ impl ECSController {
             "crab" => spawn_movement_crab(&mut self.world, other, speed as f32),
             _ => (),
         }
+    }
+
+    #[export]
+    fn add_game_to_ecs(&mut self, _owner: &Node, other: Ref<Node>) {
+        spawn_game(&mut self.world, other);
     }
 
     #[export]
