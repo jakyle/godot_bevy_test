@@ -1,4 +1,4 @@
-use bevy::prelude::{CoreStage, Plugin, SystemStage, SystemSet};
+use bevy::prelude::{CoreStage, Plugin, SystemStage, SystemSet, ParallelSystemDescriptorCoercion};
 
 use self::{
     events::{SpawnGame, SpawnTimer, UserInput, SpawnTitleMenu, DespawnPlayingGame},
@@ -34,8 +34,8 @@ impl Plugin for EngineSyncPlugin {
                 SyncStages::UpdateBevyPhysics,
                 SystemStage::single_threaded(),
             )
-            .add_system_set_to_stage(SyncStages::UpdateBevyPhysics, SystemSet::new().with_system(end_game).label("end_game"))
-            .add_system_set(SystemSet::new().with_system(despawn_playing_game).after("end_game"))
+            .add_system_to_stage(SyncStages::UpdateBevy, end_game.label("end_game"))
+            .add_system(despawn_playing_game.after("end_game"))
             .init_resource::<IdleDelta>()
             .init_resource::<PhysicsDelta>()
             .init_resource::<Option<GameOver>>();

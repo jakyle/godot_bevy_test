@@ -20,8 +20,8 @@ impl Plugin for CountdownPlugin {
             .add_system_set_to_stage(
                 SyncStages::UpdateBevy,
                 SystemSet::new()
-                    .with_run_criteria(FixedTimestep::step(0.031))
-                    .with_system(update_label),
+                    .with_run_criteria(FixedTimestep::step(0.1))
+                    .with_system(update_label_sync),
             );
     }
 }
@@ -56,11 +56,11 @@ fn end_timer(
     }
 }
 
-fn update_label(timer: Query<(&Countdown, &GodotObjRef<Label>)>) {
+fn update_label_sync(timer: Query<(&Countdown, &GodotObjRef<Label>)>) {
     for (countdown, label) in timer.iter() {
         if let Some(label) = unsafe { label.0.assume_safe_if_sane() } {
             let time_left = 20.0 - countdown.0.elapsed_secs();
-            label.set_text(format!("{time_left:.2}"));
+            label.set_text(format!("{time_left:.1}"));
         }
     }
 }
