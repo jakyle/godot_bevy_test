@@ -1,12 +1,12 @@
 use bevy::prelude::*;
-use gdnative::prelude::*;
+use gdnative::{api::AudioStreamPlayer2D, prelude::*};
 
 use rand::prelude::*;
 
-use super::godot_bevy_sync::{
-    components::GodotObjRef,
-    events::{EndGame, UserInput},
-    resources::PhysicsDelta,
+use super::engine_sync::{
+    components::{GodotObjRef, PlayingGame},
+    events::UserInput,
+    resources::{PhysicsDelta, GameOver},
     stages::SyncStages,
 };
 
@@ -20,6 +20,7 @@ impl Plugin for MovementPlugin {
             .add_system(spawn_movement_crab)
             .add_system(spawn_movement_player)
             .add_system(move_player)
+            .add_system_to_stage(SyncStages::UpdateBevy, play_move_sound)
             .add_system_to_stage(SyncStages::UpdateBevyPhysics, move_player_sync)
             .add_system_to_stage(SyncStages::UpdateBevyPhysics, move_crab_sync);
     }
@@ -32,6 +33,9 @@ pub struct Player;
 
 #[derive(Component)]
 pub struct Crab;
+
+#[derive(Component)]
+pub struct MoveSound(GodotObjRef<AudioStreamPlayer2D>);
 
 #[derive(Component)]
 pub struct Velocity(pub Vector2);
@@ -47,12 +51,24 @@ fn spawn_movement_player(
     mut on_spawn_movement_player: EventReader<SpawnMovementPlayer>,
 ) {
     for SpawnMovementPlayer((kb2, speed)) in on_spawn_movement_player.iter() {
+        let movement_sound = unsafe {
+            kb2.assume_safe()
+                .get_node("MoveSound")
+                .unwrap()
+                .assume_safe()
+                .cast::<AudioStreamPlayer2D>()
+                .unwrap()
+                .assume_shared()
+        };
+
         commands
             .spawn()
             .insert(GodotObjRef(kb2.clone()))
             .insert(Player)
             .insert(Speed(*speed))
-            .insert(Velocity(Vector2::new(0.0, 0.0)));
+            .insert(Velocity(Vector2::new(0.0, 0.0)))
+            .insert(PlayingGame)
+            .insert(MoveSound(GodotObjRef(movement_sound)));
     }
 }
 
@@ -71,6 +87,7 @@ fn spawn_movement_crab(
             .spawn()
             .insert(GodotObjRef(kb2.clone()))
             .insert(Crab)
+            .insert(PlayingGame)
             .insert(Velocity(velocity));
     }
 }
@@ -84,14 +101,14 @@ fn on_movement_input(
 ) {
     for UserInput(action) in on_movement_input.iter() {
         match *action {
-            crate::ecs::plugins::godot_bevy_sync::events::Action::Pressed(msg) => match msg {
+            crate::ecs::plugins::engine_sync::events::Action::Pressed(msg) => match msg {
                 "ui_left" => input_vector.0 += Vector2::new(-1.0, 0.0),
                 "ui_right" => input_vector.0 += Vector2::new(1.0, 0.0),
                 "ui_down" => input_vector.0 += Vector2::new(0.0, 1.0),
                 "ui_up" => input_vector.0 += Vector2::new(0.0, -1.0),
                 _ => (),
             },
-            crate::ecs::plugins::godot_bevy_sync::events::Action::Released(msg) => match msg {
+            crate::ecs::plugins::engine_sync::events::Action::Released(msg) => match msg {
                 "ui_left" => input_vector.0 -= Vector2::new(-1.0, 0.0),
                 "ui_right" => input_vector.0 -= Vector2::new(1.0, 0.0),
                 "ui_down" => input_vector.0 -= Vector2::new(0.0, 1.0),
@@ -115,6 +132,27 @@ fn move_player(
     }
 }
 
+fn play_move_sound(
+    mut query: Query<(&MoveSound, &Velocity), With<Player>>,
+
+) {
+        for (move_sound, velocity) in query.iter_mut() {
+    
+            let move_sound = unsafe { move_sound.0.0.assume_safe() };
+
+            let zero = Vector2::zero();
+
+            if velocity.0 != zero && !move_sound.is_playing() {
+                move_sound.play(0.0);
+            } else if velocity.0 == zero && move_sound.is_playing() {
+                move_sound.stop();
+            }
+        }
+    
+
+}
+
+
 #[inline]
 pub fn normalized(vector_to_normalize: Vector2) -> Vector2 {
     let option = Vector2::try_normalize(vector_to_normalize);
@@ -125,7 +163,7 @@ pub fn normalized(vector_to_normalize: Vector2) -> Vector2 {
 }
 
 fn move_crab_sync(
-    mut send_end_game: EventWriter<EndGame>,
+    mut game_over: ResMut<Option<GameOver>>,
     mut crabs: Query<(&GodotObjRef<KinematicBody2D>, &mut Velocity), With<Crab>>,
 ) {
     for (kb2, mut velocity) in crabs.iter_mut() {
@@ -147,7 +185,7 @@ fn move_crab_sync(
                         .contains("Player");
 
                     if is_player {
-                        send_end_game.send(EndGame);
+                        *game_over = Some(GameOver::Lose);
                     }
 
                     velocity.0 = velocity.0.reflect(collision.normal());
@@ -158,7 +196,7 @@ fn move_crab_sync(
 }
 
 fn move_player_sync(
-    mut send_end_game: EventWriter<EndGame>,
+    mut game_over: ResMut<Option<GameOver>>,
     mut query: Query<(&GodotObjRef<KinematicBody2D>, &Velocity), With<Player>>,
 ) {
     for (kb2, velocity) in query.iter_mut() {
@@ -179,7 +217,7 @@ fn move_player_sync(
                         .contains("rab");
 
                     if is_crab {
-                        send_end_game.send(EndGame);
+                        *game_over = Some(GameOver::Lose);
                     }
                 }
 

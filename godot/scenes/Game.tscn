@@ -1,8 +1,10 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=12 format=2]
 
 [ext_resource path="res://native/Game.gdns" type="Script" id=1]
 [ext_resource path="res://scenes/Crab.tscn" type="PackedScene" id=2]
 [ext_resource path="res://scenes/Player.tscn" type="PackedScene" id=3]
+[ext_resource path="res://assets/fonts/Roboto-regular.tres" type="DynamicFont" id=4]
+[ext_resource path="res://scenes/Countdown.gd" type="Script" id=5]
 
 [sub_resource type="PhysicsMaterial" id=5]
 friction = 0.0
@@ -34,27 +36,191 @@ script = ExtResource( 1 )
 position = Vector2( 0, 3 )
 
 [node name="Crab25" parent="YSort" instance=ExtResource( 2 )]
-position = Vector2( 1144, 157 )
+position = Vector2( 1120, 165 )
+speed = 0.1
+
+[node name="Crab45" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 1216, 85 )
 speed = 0.1
 
 [node name="Crab26" parent="YSort" instance=ExtResource( 2 )]
-position = Vector2( 1168, 285 )
+position = Vector2( 1184, 325 )
+speed = 0.1
+
+[node name="Crab46" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 1224, 549 )
+speed = 0.1
+
+[node name="Crab72" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 1168, 493 )
 speed = 0.1
 
 [node name="Crab27" parent="YSort" instance=ExtResource( 2 )]
-position = Vector2( 984, 381 )
+position = Vector2( 1224, 373 )
+speed = 0.1
+
+[node name="Crab77" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 1024, 229 )
+speed = 0.1
+
+[node name="Crab64" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 1072, 285 )
 speed = 0.1
 
 [node name="Crab28" parent="YSort" instance=ExtResource( 2 )]
-position = Vector2( 712, 517 )
+position = Vector2( 688, 653 )
+speed = 0.1
+
+[node name="Crab47" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 808, 653 )
+speed = 0.1
+
+[node name="Crab48" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 416, 645 )
+speed = 0.1
+
+[node name="Crab60" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 264, 669 )
+speed = 0.1
+
+[node name="Crab59" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 136, 653 )
+speed = 0.1
+
+[node name="Crab49" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 96, 429 )
+speed = 0.1
+
+[node name="Crab50" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 408, 133 )
+speed = 0.1
+
+[node name="Crab51" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 1176, 253 )
+speed = 0.1
+
+[node name="Crab56" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 1160, 637 )
+speed = 0.1
+
+[node name="Crab79" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 1208, 605 )
+speed = 0.1
+
+[node name="Crab73" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 64, 549 )
+speed = 0.1
+
+[node name="Crab57" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 1024, 669 )
+speed = 0.1
+
+[node name="Crab58" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 1128, 573 )
+speed = 0.1
+
+[node name="Crab78" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 1104, 669 )
+speed = 0.1
+
+[node name="Crab52" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 1080, 213 )
+speed = 0.1
+
+[node name="Crab75" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 616, 101 )
+speed = 0.1
+
+[node name="Crab36" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 904, 597 )
+speed = 0.1
+
+[node name="Crab68" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 640, 581 )
+speed = 0.1
+
+[node name="Crab37" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 1048, 533 )
+speed = 0.1
+
+[node name="Crab69" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 976, 133 )
+speed = 0.1
+
+[node name="Crab71" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 776, 565 )
+speed = 0.1
+
+[node name="Crab38" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 912, 645 )
+speed = 0.1
+
+[node name="Crab39" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 560, 661 )
+speed = 0.1
+
+[node name="Crab40" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 312, 485 )
+speed = 0.1
+
+[node name="Crab81" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 200, 589 )
+speed = 0.1
+
+[node name="Crab41" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 112, 293 )
+speed = 0.1
+
+[node name="Crab42" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 112, 125 )
+speed = 0.1
+
+[node name="Crab43" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 304, 77 )
+speed = 0.1
+
+[node name="Crab44" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 96, 373 )
 speed = 0.1
 
 [node name="Crab29" parent="YSort" instance=ExtResource( 2 )]
-position = Vector2( 696, 205 )
+position = Vector2( 216, 149 )
+speed = 0.1
+
+[node name="Crab65" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 1040, 93 )
+speed = 0.1
+
+[node name="Crab55" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 464, 69 )
+speed = 0.1
+
+[node name="Crab54" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 712, 69 )
+speed = 0.1
+
+[node name="Crab53" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 896, 53 )
 speed = 0.1
 
 [node name="Crab30" parent="YSort" instance=ExtResource( 2 )]
-position = Vector2( 368, 301 )
+position = Vector2( 232, 501 )
+speed = 0.1
+
+[node name="Crab80" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 312, 229 )
+speed = 0.1
+
+[node name="Crab74" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 216, 325 )
+speed = 0.1
+
+[node name="Crab62" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 208, 221 )
+speed = 0.1
+
+[node name="Crab66" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 96, 61 )
 speed = 0.1
 
 [node name="Crab31" parent="YSort" instance=ExtResource( 2 )]
@@ -65,8 +231,16 @@ speed = 0.1
 position = Vector2( 344, 573 )
 speed = 0.1
 
+[node name="Crab61" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 200, 421 )
+speed = 0.1
+
 [node name="Crab33" parent="YSort" instance=ExtResource( 2 )]
-position = Vector2( 536, 509 )
+position = Vector2( 416, 573 )
+speed = 0.1
+
+[node name="Crab70" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 504, 637 )
 speed = 0.1
 
 [node name="Crab34" parent="YSort" instance=ExtResource( 2 )]
@@ -74,11 +248,23 @@ position = Vector2( 336, 157 )
 speed = 0.1
 
 [node name="Crab35" parent="YSort" instance=ExtResource( 2 )]
-position = Vector2( 768, 101 )
+position = Vector2( 1072, 373 )
+speed = 0.1
+
+[node name="Crab76" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 928, 93 )
+speed = 0.1
+
+[node name="Crab67" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 1208, 429 )
+speed = 0.1
+
+[node name="Crab63" parent="YSort" instance=ExtResource( 2 )]
+position = Vector2( 1104, 429 )
 speed = 0.1
 
 [node name="Player" parent="YSort" instance=ExtResource( 3 )]
-position = Vector2( 584, 365 )
+position = Vector2( 640, 381 )
 speed = 20.0
 
 [node name="Wall" type="StaticBody2D" parent="."]
@@ -124,3 +310,35 @@ __meta__ = {
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="wallciel2"]
 shape = SubResource( 3 )
+
+[node name="Control" type="Control" parent="."]
+margin_left = 512.0
+margin_right = 768.0
+margin_bottom = 128.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Panel" type="Panel" parent="Control"]
+anchor_right = 1.0
+anchor_bottom = 0.562
+margin_left = 88.0
+margin_top = 16.0
+margin_right = -88.0
+margin_bottom = -23.936
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Countdown" type="Label" parent="Control/Panel"]
+margin_left = 8.0
+margin_right = 71.0
+margin_bottom = 31.0
+custom_fonts/font = ExtResource( 4 )
+text = "20.00"
+align = 1
+valign = 1
+script = ExtResource( 5 )
+__meta__ = {
+"_edit_use_anchors_": false
+}

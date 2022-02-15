@@ -11,6 +11,12 @@ impl Delta for IdleDelta {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
+pub enum GameOver {
+    Win,
+    Lose,
+}
+
 #[derive(Default)]
 pub struct PhysicsDelta(pub f32);
 

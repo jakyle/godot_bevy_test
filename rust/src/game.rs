@@ -4,7 +4,6 @@ use gdnative::prelude::*;
 #[derive(NativeClass)]
 #[inherit(Node)]
 #[register_with(Self::register_builder)]
-// #[user_data(gdnative::nativescript::user_data::RwLockData<Game>)]
 pub struct Game {
     name: String,
 }
